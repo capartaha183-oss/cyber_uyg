@@ -68,7 +68,6 @@ class HomeScreen extends StatelessWidget {
       ]),
       _ToolCategory(title: 'SİBER ARENA 🎮', tools: [
         _ToolItem(icon: Icons.sports_esports, title: 'SİBER\nARENA', subtitle: 'Oyun, XP, rozetler', color: const Color(0xFFFFD700), route: const CyberGameScreen()),
-ARENA', subtitle: 'Oyun, XP, rozetler', color: const Color(0xFFFFD700), route: const CyberGameScreen()),
       ]),
       _ToolCategory(title: 'HACKER ARAÇLARI', tools: [
         _ToolItem(icon: Icons.terminal,               title: 'TERMİNAL',            subtitle: 'Komut satırı',            color: const Color(0xFF00FF88),     route: const TerminalScreen()),
