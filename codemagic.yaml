@@ -11,25 +11,40 @@ workflows:
       - name: Bağımlılıkları yükle
         script: flutter pub get
 
+      - name: Bundle ID düzelt
+        script: |
+          cd ios
+          sed -i '' 's/PRODUCT_BUNDLE_IDENTIFIER = .*/PRODUCT_BUNDLE_IDENTIFIER = com.tahacapar.cyberguard;/g' Runner.xcodeproj/project.pbxproj || true
+
       - name: Pod install
         script: |
           cd ios
           pod install
 
-      - name: Flutter build iOS (imzasız)
+      - name: Xcode ile imzasız build
         script: |
-          flutter build ios --release --no-codesign
+          xcodebuild \
+            -workspace ios/Runner.xcworkspace \
+            -scheme Runner \
+            -configuration Release \
+            -sdk iphoneos \
+            CODE_SIGNING_ALLOWED=NO \
+            CODE_SIGNING_REQUIRED=NO \
+            CODE_SIGN_IDENTITY="" \
+            DEVELOPMENT_TEAM="" \
+            -derivedDataPath build/ios/derived
 
-      - name: IPA oluştur (imzasız)
+      - name: IPA oluştur
         script: |
-          cd build/ios/iphoneos
-          mkdir Payload
-          cp -r Runner.app Payload/
+          APP_PATH=$(find build/ios/derived -name "*.app" | head -1)
+          mkdir -p build/ios/ipa/Payload
+          cp -r "$APP_PATH" build/ios/ipa/Payload/
+          cd build/ios/ipa
           zip -r CyberGuard.ipa Payload
-          mv CyberGuard.ipa $CM_BUILD_DIR/
+          echo "IPA oluşturuldu: $(pwd)/CyberGuard.ipa"
 
     artifacts:
-      - $CM_BUILD_DIR/CyberGuard.ipa
+      - build/ios/ipa/CyberGuard.ipa
       - /tmp/xcodebuild_logs/*.log
 
     publishing:
