@@ -1,22 +1,13 @@
 workflows:
-  ios-release:
-    name: CyberGuard iOS Release
+  ios-no-signing:
+    name: CyberGuard iOS IPA (İmzasız)
     max_build_duration: 60
     environment:
       flutter: stable
       xcode: latest
       cocoapods: default
-      vars:
-        BUNDLE_ID: "com.tahacapar.cyberguard"
-        APP_NAME: "CyberGuard"
-      ios_signing:
-        distribution_type: app_store  # veya ad_hoc
-        bundle_identifier: com.tahacapar.cyberguard
 
     scripts:
-      - name: Flutter versiyonunu göster
-        script: flutter --version
-
       - name: Bağımlılıkları yükle
         script: flutter pub get
 
@@ -25,26 +16,26 @@ workflows:
           cd ios
           pod install
 
-      - name: Flutter build iOS
+      - name: Flutter build iOS (imzasız)
         script: |
           flutter build ios --release --no-codesign
 
-      - name: IPA oluştur (imzalı)
+      - name: IPA oluştur (imzasız)
         script: |
-          xcode-project use-profiles
-          xcode-project build-ipa \
-            --workspace ios/Runner.xcworkspace \
-            --scheme Runner
+          cd build/ios/iphoneos
+          mkdir Payload
+          cp -r Runner.app Payload/
+          zip -r CyberGuard.ipa Payload
+          mv CyberGuard.ipa $CM_BUILD_DIR/
 
     artifacts:
-      - build/ios/ipa/*.ipa
+      - $CM_BUILD_DIR/CyberGuard.ipa
       - /tmp/xcodebuild_logs/*.log
-      - flutter_drive.log
 
     publishing:
       email:
         recipients:
-          - capartaha183@gmail.com  # buraya kendi e-postanı yaz
+          - capartaha183@gmail.com
         notify:
           success: true
           failure: true
